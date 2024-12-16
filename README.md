@@ -1,69 +1,139 @@
+# SpinaCMS Dockerized Setup
 
-# Spina CMS with Docker
+This project provides a Dockerized developer environment for Spina CMS, enabling developers to quickly set up and run the application locally.
 
-This repository sets up [Spina CMS](https://www.spinacms.com/) using Docker for development. Spina CMS is a user-friendly and extensible content management system built with Ruby on Rails.
+---
 
 ## Requirements
 
-- **Ruby**: 3.2.6
-- **Rails**: 7.0.8.7 (with Importmap enabled)
-- **Spina**: 2.6.2
+- **Docker**: Ensure Docker is installed and running on your system.
+- Compatible versions:
+  - **Ruby**: `3.2.6`
+  - **Rails**: `7.0.8.7` (required for Importmap compatibility)
+  - **Spina**: `2.6.2`
 
-These specific versions are required to ensure compatibility with Importmap and Spina's features.
+---
 
-## Getting Started
+## Setup Instructions
 
-Follow these steps to set up and run the project:
+1. **Build and start the containers** in detached mode:
+   ```bash
+   docker-compose up --build -d
+   ```
 
-### 1. Build and Start the Containers
-Run the following command to build the Docker images and start the containers in detached mode:
+2. **Create the database**:
+   ```bash
+   docker exec -it spinacms-app-1 rails db:create
+   ```
+
+3. **Install Active Storage**:
+   ```bash
+   docker exec -it spinacms-app-1 rails active_storage:install
+   ```
+
+4. **Set up Spina CMS**:
+   ```bash
+   docker exec -it spinacms-app-1 rails spina:install
+   ```
+
+5. **Access the application**:
+   - Default homepage: [http://127.0.0.1:3000](http://127.0.0.1:3000)
+   - Admin dashboard: [http://127.0.0.1:3000/admin](http://127.0.0.1:3000/admin)
+
+---
+
+## Features
+
+- Fully Dockerized environment with persistent database state.
+- Local development setup using **"trust mode"** for PostgreSQL.
+- Compatibility with Spina CMS version `2.6.2`.
+
+---
+
+## Challenges Faced
+
+- **Re-learning Rails**: After nearly a decade of not working directly with Ruby on Rails projects, this setup presented a steep re-familiarization curve.
+- **Mobility Configuration**: Setting up translations with Mobility required research and troubleshooting.
+- **Importmap Issues**: 
+  - Initially attempted to replace Importmap with Webpacker, which involved extensive trial and error. Despite initial success, the complexity led to reverting to Importmap.
+  - Resolved an error with `spina_importmap_tags` by overriding the helper in the `SpinaHelper` module to bypass `importmap-rails`.
+
+   **Code Snippet (config/initializers/spina_importmap_override.rb)**:
+   ```ruby
+   module Spina
+     module SpinaHelper
+       # Override the helper to avoid calling importmap-rails
+       def spina_importmap_tags
+         # Return an empty string as importmap is not used
+         "".html_safe
+       end
+     end
+   end
+   ```
+
+---
+
+## Areas of Uncertainty
+
+- **Rails Version**: Used Rails `7.0.8.7` instead of the suggested `6.1.4.4` due to the need for Importmap compatibility. Future compatibility with other dependencies should be verified.
+- **Importmap Workaround**: Overriding the `spina_importmap_tags` helper bypasses reliance on Importmap. While functional, this may pose challenges for upgrades or features relying on Importmap.
+
+---
+
+## Known Caveats
+
+- **Production Considerations**: This setup is optimized for development. For production:
+  - Enable asset precompilation.
+  - Use a production-grade database with secure authentication.
+- **Performance**: No performance tuning has been implemented.
+- **PostgreSQL Trust Mode**: The setup uses "trust mode" for simplicity. Replace it with secure authentication for production environments.
+
+---
+
+## PostgreSQL Trust Mode
+
+This environment uses **"trust mode"** for PostgreSQL authentication to simplify local development. It bypasses user authentication, making it unsuitable for production.
+
+---
+
+## Functionalities
+
+Once the setup is complete, the following Spina CMS features can be tested:
+
+- Modifying the homepage.
+- Creating new pages.
+- Adding text and images to pages.
+- Stopping and restarting containers while retaining the application state.
+
+---
+
+## Deliverables
+
+- This repository includes:
+  - A functional `Dockerfile` for the application.
+  - A `docker-compose.yaml` file for orchestrating the application and database.
+  - A `README.md` with setup and operational instructions.
+  - Persistent Spina CMS state using Docker volumes.
+
+---
+
+## Troubleshooting
+
+If you encounter issues, check the container logs:
 ```bash
-docker-compose up --build -d
+docker-compose logs
 ```
 
-### 2. Create the Database
-Once the containers are running, execute the following command to create the database:
-```bash
-docker exec -it spinacms-app-1 rails db:create
-```
-
-### 3. Install Active Storage
-Set up Active Storage (used for file uploads):
-```bash
-docker exec -it spinacms-app-1 rails active_storage:install
-```
-
-### 4. Install Spina CMS
-Run the Spina installation to set up initial data and configurations:
-```bash
-docker exec -it spinacms-app-1 rails spina:install
-```
-
-### 5. Access the Application
-Once all the setup commands have been executed, you can access the application at:
-```
-http://localhost:3000/admin
-```
-
-## Stopping the Containers
-To stop the running containers, use:
-```bash
-docker-compose down
-```
-
-## Notes
-- This setup is optimized for development. For production, additional steps like enabling asset precompilation and setting up a production database would be required.
-- If you encounter issues, verify the container logs with:
-  ```bash
-  docker-compose logs
-  ```
-
-## Technologies Used
-- **Ruby**: 3.2.6
-- **Rails**: 7.0.8.7 (with Importmap for JavaScript management)
-- **Spina CMS**: 2.6.2
-- **PostgreSQL**: 15
-- **Docker**
+---
 
 ## Contributing
-Feel free to open issues or submit pull requests to improve this setup.
+
+Contributions are welcome! Open issues or submit pull requests to improve this setup.
+
+---
+
+## References
+
+- [Spina CMS Documentation](https://github.com/SpinaCMS/Spina)
+- [Rails Guides](https://guides.rubyonrails.org/)
+- [Docker Documentation](https://docs.docker.com/)
