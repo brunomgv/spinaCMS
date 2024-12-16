@@ -1,9 +1,24 @@
-# Use a slim Ruby image to reduce image size
-FROM ruby:3.2.6-slim
+# Build stage for dependencies
+FROM ruby:3.2.6-slim AS builder
 
-# Install dependencies with --no-install-recommends to install only essential packages, and clean up apt cache to reduce image size
 RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     build-essential \
+    libpq-dev \
+    nodejs \
+    yarn && \
+    gem install bundler -v 2.4.14 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY Gemfile Gemfile.lock ./
+RUN bundle install --jobs=4 --retry=3
+
+# Final stage
+FROM ruby:3.2.6-slim
+
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     libpq-dev \
     nodejs \
     yarn \
@@ -11,24 +26,13 @@ RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Set up working directory
 WORKDIR /app
 
-# Install bundler separately for better layer caching
-RUN gem install bundler -v 2.4.14
-
-# Copy Gemfile and Gemfile.lock first to leverage Docker layer caching
-COPY Gemfile Gemfile.lock ./
-
-# Install gems
-RUN bundle install --jobs=4 --retry=3
-
-# Copy application code
+COPY --from=builder /usr/local/bundle /usr/local/bundle
 COPY . .
 
-# Expose port
-EXPOSE 3000
+ENV RAILS_ENV=development
 
-# Use ENTRYPOINT for flexibility and CMD for default behavior
-ENTRYPOINT ["rails", "server", "-b", "0.0.0.0"]
-CMD ["-p", "3000"]
+EXPOSE 3000
+ENTRYPOINT ["rails"]
+CMD ["server", "-b", "0.0.0.0", "-p", "3000"]
