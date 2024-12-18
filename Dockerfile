@@ -5,7 +5,9 @@ RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
     nodejs \
-    yarn && \
+    yarn \
+    libvips42 \
+    libvips-dev && \
     gem install bundler -v 2.4.14 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -22,7 +24,9 @@ RUN apt-get update -qq && apt-get install -y --no-install-recommends \
     libpq-dev \
     nodejs \
     yarn \
-    imagemagick && \
+    imagemagick \
+    libvips42 \
+    libvips-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
