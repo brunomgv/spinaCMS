@@ -9,7 +9,7 @@ This project provides a Dockerized developer environment for Spina CMS, enabling
 - **Docker**: Ensure Docker is installed and running on your system.
 - Compatible versions:
   - **Ruby**: `3.2.6`
-  - **Rails**: `7.0.8.7` (required for Importmap compatibility)
+  - **Rails**: `7.1.5.1` (required for Importmap compatibility)
   - **Spina**: `2.6.2`
 
 ---
@@ -36,7 +36,12 @@ This project provides a Dockerized developer environment for Spina CMS, enabling
    docker exec -it spinacms-app-1 rails spina:install
    ```
 
-5. **Access the application**:
+5. **Restart the containers**:
+   ```bash
+   docker-compose restart
+   ```
+
+6. **Access the application**:
    - Default homepage: [http://127.0.0.1:3000](http://127.0.0.1:3000)
    - Admin dashboard: [http://127.0.0.1:3000/admin](http://127.0.0.1:3000/admin)
 
@@ -60,22 +65,22 @@ This project provides a Dockerized developer environment for Spina CMS, enabling
 
    **Code Snippet (config/initializers/spina_importmap_override.rb)**:
    ```ruby
-   module Spina
-     module SpinaHelper
-       # Override the helper to avoid calling importmap-rails
-       def spina_importmap_tags
-         # Return an empty string as importmap is not used
-         "".html_safe
-       end
-     end
-   end
+  module ActionView::Helpers::JavaScriptHelper
+    def javascript_importmap_shim_tag
+      "".html_safe
+    end
+
+    def javascript_importmap_shim_nonce_configuration_tag
+      "".html_safe
+    end
+  end
    ```
 
 ---
 
 ## Areas of Uncertainty
 
-- **Rails Version**: Used Rails `7.0.8.7` instead of the suggested `6.1.4.4` due to the need for Importmap compatibility. Future compatibility with other dependencies should be verified.
+- **Rails Version**: Used Rails `7.1.5.1` instead of the suggested `6.1.4.4` due to the need for Importmap compatibility. Future compatibility with other dependencies should be verified.
 - **Importmap Workaround**: Overriding the `spina_importmap_tags` helper bypasses reliance on Importmap. While functional, this may pose challenges for upgrades or features relying on Importmap.
 
 ---
