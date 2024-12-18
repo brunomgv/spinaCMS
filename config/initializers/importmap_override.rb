@@ -1,9 +1,9 @@
-module Spina
-  module SpinaHelper
-    # Override the helper to avoid calling importmap-rails
-    def spina_importmap_tags
-      # Return an empty string as importmap is not used
-      "".html_safe
-    end
+module ActionView::Helpers::JavaScriptHelper
+  def javascript_importmap_shim_tag
+    "".html_safe
+  end
+
+  def javascript_importmap_shim_nonce_configuration_tag
+    "".html_safe
   end
 end
