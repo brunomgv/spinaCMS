@@ -61,7 +61,8 @@ This project provides a Dockerized developer environment for Spina CMS, enabling
 - **Mobility Configuration**: Setting up translations with Mobility required research and troubleshooting.
 - **Importmap Issues**: 
   - Initially attempted to replace Importmap with Webpacker, which involved extensive trial and error. Despite initial success, the complexity led to reverting to Importmap.
-  - Resolved an error with `spina_importmap_tags` by overriding the helper in the `SpinaHelper` module to bypass `importmap-rails`.
+  - Resolved a recurring error involving spina_importmap_tags, which was breaking due to compatibility issues with importmap-rails.
+  - Specifically, fixed issues with both javascript_importmap_shim_tag and javascript_importmap_shim_nonce_configuration_tag methods, which were undefined and causing errors in the application.
 
    **Code Snippet (config/initializers/spina_importmap_override.rb)**:
    ```ruby
@@ -87,7 +88,8 @@ This project provides a Dockerized developer environment for Spina CMS, enabling
 
 ## Known Caveats
 
-- **Production Considerations**: This setup is optimized for development. For production:
+- **Production Considerations**: This setup is optimized for development.
+- **For production**:
   - Enable asset precompilation.
   - Use a production-grade database with secure authentication.
 - **Performance**: No performance tuning has been implemented.
