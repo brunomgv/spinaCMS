@@ -26,22 +26,12 @@ This project provides a Dockerized developer environment for Spina CMS, enabling
    docker exec -it spinacms-app-1 rails db:create
    ```
 
-3. **Install Active Storage**:
-   ```bash
-   docker exec -it spinacms-app-1 rails active_storage:install
-   ```
-
-4. **Set up Spina CMS**:
+3. **Set up Spina CMS**:
    ```bash
    docker exec -it spinacms-app-1 rails spina:install
    ```
 
-5. **Restart the containers**:
-   ```bash
-   docker-compose restart
-   ```
-
-6. **Access the application**:
+4. **Access the application**:
    - Default homepage: [http://127.0.0.1:3000](http://127.0.0.1:3000)
    - Admin dashboard: [http://127.0.0.1:3000/admin](http://127.0.0.1:3000/admin)
 
